@@ -3,111 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday, Ken! 🎹</title>
+    <title>Happy Birthday, Ken!</title>
     <style>
         body {
-            background-color: #fce4ec;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            padding: 20px;
+            background-color: #f4f1ea;
+            color: #4a4a4a;
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
         }
-        .intro-img {
-            max-width: 400px;
-            width: 100%;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+        .flower {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+            animation: float linear infinite;
         }
-        h1 { color: #d81b60; margin-bottom: 10px; }
-        .piano {
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-            border: 5px solid #880e4f;
-            border-radius: 10px;
-            padding: 10px;
+
+        @keyframes float {
+            0% { transform: translateY(100vh); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-10vh); opacity: 0; }
+        }
+
+        .container { text-align: center; z-index: 10; margin-bottom: 20px; }
+        
+        /* Guide Box */
+        .guide-box {
             background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #8d8778;
         }
+
+        .piano-wrapper {
+            width: 95%;
+            max-width: 1000px;
+            background: #dcd7c9;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .piano { display: inline-flex; }
+
         .key {
-            width: 60px;
-            height: 180px;
-            border: 1px solid #333;
-            background: white;
+            width: 30px;
+            height: 150px;
+            border: 1px solid #b8b3a5;
+            background: #fff;
             cursor: pointer;
+            flex-shrink: 0;
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            font-weight: bold;
-            transition: background 0.1s;
-            user-select: none;
+            font-size: 10px;
         }
-        .key:active { background: #f8bbd0; }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            z-index: 1000;
-            text-align: center;
-            border: 5px solid #d81b60;
+
+        .key.black {
+            background: #4a4a4a;
+            width: 20px;
+            margin-left: -10px;
+            margin-right: -10px;
+            z-index: 2;
         }
+
+        .key:active { background: #e8e8e8; }
     </style>
 </head>
 <body>
 
-    <!-- Dito nakalagay ang inyong picture -->
-    <img src="couple.png" alt="Ken and Me" class="intro-img">
-    
-    <h1>Happy Birthday, Ken! 🎂</h1>
-    <p>Pindutin ang piano keys para mag-celebrate!</p>
-
-    <div class="piano">
-        <div class="key" onclick="playAndCelebrate('C4')">C</div>
-        <div class="key" onclick="playAndCelebrate('D4')">D</div>
-        <div class="key" onclick="playAndCelebrate('E4')">E</div>
-        <div class="key" onclick="playAndCelebrate('F4')">F</div>
-        <div class="key" onclick="playAndCelebrate('G4')">G</div>
+    <div class="container">
+        <h1>Happy Birthday, Ken</h1>
+        <div class="guide-box" id="guide">
+            Guide: Pindutin ang keys na may label na: <span style="color:#d81b60">0, 0, 2, 0, 5, 4</span>
+        </div>
+        <p id="status">Good luck!</p>
     </div>
 
-    <div class="modal" id="modal">
-        <h2>Happy Birthday, Ken! 🎉</h2>
-        <p>Enjoy your special day!</p>
-        <button onclick="closeModal()">Close</button>
+    <div class="piano-wrapper">
+        <div class="piano" id="piano"></div>
     </div>
 
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playNote(freq) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 1);
+        // Floating Flowers
+        function createFlower() {
+            const f = document.createElement('div');
+            f.innerHTML = '✿';
+            f.className = 'flower';
+            f.style.left = Math.random() * 100 + 'vw';
+            f.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            document.body.appendChild(f);
+            setTimeout(() => f.remove(), 10000);
         }
+        setInterval(createFlower, 2000);
 
-        const notes = { 'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00 };
+        // Piano Logic
+        const piano = document.getElementById('piano');
+        const status = document.getElementById('status');
+        const melody = [0, 0, 2, 0, 5, 4];
+        let progress = 0;
 
-        function playAndCelebrate(noteName) {
-            playNote(notes[noteName]);
-            document.getElementById('modal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
+        for (let i = 0; i < 81; i++) {
+            const key = document.createElement('div');
+            const isBlack = [1, 3, 6, 8, 10].includes(i % 12);
+            key.className = 'key' + (isBlack ? ' black' : '');
+            if (!isBlack) key.innerText = i % 12; // Label para sa guide
+            
+            key.onclick = () => {
+                if (i % 12 === melody[progress]) {
+                    progress++;
+                    status.innerText = "Nice! " + progress + "/" + melody.length;
+                    if (progress === melody.length) {
+                        alert("Happy Birthday, Ken! 🎉");
+                        progress = 0;
+                        status.innerText = "Ulitin natin? Good luck!";
+                    }
+                } else {
+                    progress = 0;
+                    status.innerText = "Mali! Simulan uli sa umpisa.";
+                }
+            };
+            piano.appendChild(key);
         }
     </script>
 </body>
