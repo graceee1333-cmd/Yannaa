@@ -1,1 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Ken! 🎹</title>
+    <style>
+        body {
+            background-color: #fce4ec;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .intro-img {
+            max-width: 400px;
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 { color: #d81b60; margin-bottom: 10px; }
+        .piano {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            border: 5px solid #880e4f;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+        }
+        .key {
+            width: 60px;
+            height: 180px;
+            border: 1px solid #333;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-weight: bold;
+            transition: background 0.1s;
+            user-select: none;
+        }
+        .key:active { background: #f8bbd0; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            text-align: center;
+            border: 5px solid #d81b60;
+        }
+    </style>
+</head>
+<body>
 
+    <!-- Dito nakalagay ang inyong picture -->
+    <img src="couple.png" alt="Ken and Me" class="intro-img">
+    
+    <h1>Happy Birthday, Ken! 🎂</h1>
+    <p>Pindutin ang piano keys para mag-celebrate!</p>
+
+    <div class="piano">
+        <div class="key" onclick="playAndCelebrate('C4')">C</div>
+        <div class="key" onclick="playAndCelebrate('D4')">D</div>
+        <div class="key" onclick="playAndCelebrate('E4')">E</div>
+        <div class="key" onclick="playAndCelebrate('F4')">F</div>
+        <div class="key" onclick="playAndCelebrate('G4')">G</div>
+    </div>
+
+    <div class="modal" id="modal">
+        <h2>Happy Birthday, Ken! 🎉</h2>
+        <p>Enjoy your special day!</p>
+        <button onclick="closeModal()">Close</button>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playNote(freq) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1);
+        }
+
+        const notes = { 'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00 };
+
+        function playAndCelebrate(noteName) {
+            playNote(notes[noteName]);
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
